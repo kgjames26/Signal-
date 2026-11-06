@@ -176,4 +176,16 @@ const styles = {
   },
   visit: {
     color: '#34d399',
-    fon
+    fontWeight: 500,
+  },
+  url: {
+    color: '#737373',
+  },
+  footer: {
+    borderTop: '1px solid #262626',
+    padding: '1.5rem',
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#737373',
+  },
+};
