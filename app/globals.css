@@ -1,0 +1,13 @@
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+a:hover {
+  border-color: rgba(16, 185, 129, 0.5) !important;
+  background: #171717 !important;
+}
+
+a:hover h2 {
+  color: #34d399;
+}
