@@ -47,19 +47,28 @@ export default function Home() {
         )}
 
         <div style={styles.grid}>
-          {projects.map((p) => (
-            <a key={p.id} href={p.url} target="_blank" rel="noopener noreferrer" style={styles.card}>
-              <div style={styles.cardHeader}>
-                <h2 style={styles.cardTitle}>{p.name}</h2>
-                <span style={styles.framework}>{p.framework}</span>
-              </div>
-              <p style={styles.description}>{p.description}</p>
-              <div style={styles.cardFooter}>
-                <span style={styles.visit}>Visiter →</span>
-                <span style={styles.url}>{p.url.replace('https://', '')}</span>
-              </div>
-            </a>
-          ))}
+          {projects.map((p) => {
+            const Card = p.url ? 'a' : 'div';
+            return (
+              <Card
+                key={p.id}
+                href={p.url || undefined}
+                target={p.url ? '_blank' : undefined}
+                rel={p.url ? 'noopener noreferrer' : undefined}
+                style={p.url ? styles.card : { ...styles.card, opacity: 0.55, cursor: 'default' }}
+              >
+                <div style={styles.cardHeader}>
+                  <h2 style={styles.cardTitle}>{p.name}</h2>
+                  <span style={styles.framework}>{p.framework}</span>
+                </div>
+                <p style={styles.description}>{p.description}</p>
+                <div style={styles.cardFooter}>
+                  <span style={styles.visit}>{p.url ? 'Visiter →' : 'Aucun déploiement prêt'}</span>
+                  <span style={styles.url}>{p.url ? p.url.replace(/^https?:\\/\\//, '') : 'Indisponible'}</span>
+                </div>
+              </Card>
+            );
+          })}
         </div>
       </main>
 
