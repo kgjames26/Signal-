@@ -66,7 +66,8 @@ export async function GET() {
             const productionAlias = aliases.find((alias) => !alias.includes('-git-')) || aliases[0];
             const host = productionAlias || deployment?.url;
             if (host) {
-              url = `https://${String(host).replace(/^https?:\\/\\//, '').replace(/\\/+$/, '')}`;
+              const address = String(host).trim();
+              url = address.startsWith('http://') || address.startsWith('https://') ? address : `https://${address}`;
             }
           }
         } catch {
