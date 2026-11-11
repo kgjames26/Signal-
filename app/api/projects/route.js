@@ -46,18 +46,45 @@ export async function GET() {
     }
 
     const data = await res.json();
-    const projects = (data.projects || [])
-      .filter((p) => p.name !== 'signal') // exclure ce site lui-même
-      .map((p) => ({
-        id: p.id,
-        name: p.name,
-        description: getDescription(p.name),
-        url: `https://${p.name}.vercel.app`,
-        framework: p.framework || 'unknown',
-        updatedAt: p.updatedAt,
-      }))
-      .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    const sourceProjects = (data.projects || []).filter((p) => p.name !== 'signal'); // exclure ce site lui-même
+    const projects = await Promise.all(
+      sourceProjects.map(async (p) => {
+        let url = null;
+        try {
+          const deploymentsResponse = await fetch(
+            `https://api.vercel.com/v6/deployments?projectId=${encodeURIComponent(p.id)}&target=production&state=READY&limit=1`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+              next: { revalidate: 60 },
+            }
+          );
 
+          if (deploymentsResponse.ok) {
+            const deploymentsData = await deploymentsResponse.json();
+            const deployment = deploymentsData.deployments?.[0];
+            const aliases = Array.isArray(deployment?.alias) ? deployment.alias : [];
+            const productionAlias = aliases.find((alias) => !alias.includes('-git-')) || aliases[0];
+            const host = productionAlias || deployment?.url;
+            if (host) {
+              url = `https://${String(host).replace(/^https?:\\/\\//, '').replace(/\\/+$/, '')}`;
+            }
+          }
+        } catch {
+          // Une erreur sur un projet ne doit pas empêcher l'affichage des autres.
+        }
+
+        return {
+          id: p.id,
+          name: p.name,
+          description: getDescription(p.name),
+          url,
+          framework: p.framework || 'unknown',
+          updatedAt: p.updatedAt,
+        };
+      })
+    );
+
+    projects.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
     return NextResponse.json({ projects });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
