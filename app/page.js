@@ -64,7 +64,7 @@ export default function Home() {
                 <p style={styles.description}>{p.description}</p>
                 <div style={styles.cardFooter}>
                   <span style={styles.visit}>{p.url ? 'Visiter →' : 'Aucun déploiement prêt'}</span>
-                  <span style={styles.url}>{p.url ? p.url.replace(/^https?:\\/\\//, '') : 'Indisponible'}</span>
+                  <span style={styles.url}>{p.url ? new URL(p.url).host : 'Indisponible'}</span>
                 </div>
               </Card>
             );
